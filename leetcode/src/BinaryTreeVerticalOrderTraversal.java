@@ -1,50 +1,61 @@
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 public class BinaryTreeVerticalOrderTraversal {
 
-	public boolean exist(char[][] board, String word) {
-        if (board == null || word == null) {
-            return false;
-        }
-        
-        int m = board.length;
-        int n = board[0].length;
-        
-        int k = 0;
-        for (int i = 0; i < m; i++) {
-            for (int j = 0; j < n; j++) {
-                if (dfs(board, word, i, j, k)) {
-                    return true;
-                }
-            }
-        }
-        
-        return false;
-    }
-    
-    private boolean dfs(char[][] board, String word, int i, int j, int k) {
-        int m = board.length;
-        int n = board[0].length;
-        
-        if (j < 0 || i < 0 || i >= m || j >= n) {
-            return false;
-        }
-        
-        if (board[i][j] == word.charAt(k)) {
-            char temp = board[i][j];
-            board[i][j] = '#';
-            
-            if (k == word.length() - 1) {
-                return true;
-            } else if ( dfs(board, word, i-1, j, k+1)
-                || dfs(board, word, i+1, j, k+1)
-                || dfs(board, word, i, j-1, k+1)
-                || dfs(board, word, i, j+1, k+1)) {
-                    return true;
-            }
-            
-            board[i][j] = temp;
-        }
-        
-        return false;
-    }
+	public List<List<Integer>> verticalOrder(TreeNode root) {
+	    List<List<Integer>> result = new ArrayList<List<Integer>>();
+	    if(root==null)
+	        return result;
+	 
+	    // level and list    
+	    Map<Integer, List<Integer>> map = new HashMap<Integer, List<Integer>>();
+	 
+	    LinkedList<TreeNode> queue = new LinkedList<TreeNode>();
+	    LinkedList<Integer> level = new LinkedList<Integer>();
+	 
+	    queue.offer(root);
+	    level.offer(0);
+	 
+	    int minLevel=0;
+	    int maxLevel=0;
+	 
+	    while(!queue.isEmpty()){
+	        TreeNode p = queue.poll();
+	        int l = level.poll();
+	 
+	        minLevel=Math.min(minLevel, l);
+	        maxLevel=Math.max(maxLevel, l);
+	 
+	        if(map.containsKey(l)){
+	            map.get(l).add(p.val);
+	        }else{
+	            List<Integer> list = new ArrayList<Integer>();
+	            list.add(p.val);
+	            map.put(l, list);
+	        }
+	 
+	        if(p.left!=null){
+	            queue.offer(p.left);
+	            level.offer(l-1);
+	        }
+	 
+	        if(p.right!=null){
+	            queue.offer(p.right);
+	            level.offer(l+1);
+	        }
+	    }
+	 
+	 
+	    for(int i=minLevel; i<=maxLevel; i++){
+	        if(map.containsKey(i)){
+	            result.add(map.get(i));
+	        }
+	    }
+	 
+	    return result;
+	}
 }
